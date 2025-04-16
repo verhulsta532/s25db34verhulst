@@ -1,0 +1,8 @@
+extends layout
+
+block content
+  - var image_name = ["pug.jpg", "golden.jpg", "german.jpg", "bull.jpg", "puppy.jpg"  ]
+  - for (var i=0; i < 3; i++)
+    - var random_index = Math.floor(Math.random() * 5);
+    - var image_name = image_name[random_index];
+    img(src=`/images/${image_name}`, alt=`Random item: ${image_name}`, height='300', width='300')

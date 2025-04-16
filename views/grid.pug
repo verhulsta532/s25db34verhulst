@@ -1,0 +1,24 @@
+extends layout
+
+block content
+  h1 Grid Display
+
+  p Rows: #{query.rows}, Cols: #{query.cols}
+
+  - var rows = Number(query.rows);
+  - var cols = Number(query.cols);
+
+  if (!Number.isInteger(rows) || !Number.isInteger(cols))
+    p Error: Rows and Cols must be integers.
+  else if (rows < 3 || rows > 13)
+    p Error: Rows must be between 3 and 13.
+  else if (cols < 3 || cols > 13)
+    p Error: Cols must be between 3 and 13.
+  else
+    table#outer
+      - for (let i = 0; i < rows; i++) {
+        tr#middle
+          - for (let j = 0; j < cols; j++) {
+            td = i - j
+          - }
+      - }

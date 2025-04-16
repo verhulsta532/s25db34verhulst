@@ -1,0 +1,17 @@
+extends layout
+
+block content
+  - var results = [
+  -   { name: 'Fluffy', breed: 'German Shepherd', age: 2 },
+  -   { name: 'Mittens', breed: 'Golden Retriever', age: 4 },
+  -   { name: 'Whiskers', breed: 'Bulldog', age: 1 },
+  -   { name: 'Smokey', breed: 'Poodle', age: 3 }
+  - ];
+
+  .container-fluid
+    .row
+      - each dog in results
+        .col-sm-2
+          p Name: #{dog.name}
+          p Breed: #{dog.breed}
+          p Age: #{dog.age}

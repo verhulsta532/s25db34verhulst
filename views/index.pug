@@ -1,0 +1,17 @@
+extends layout
+
+block content
+  h1= title
+  p hello
+  button(type="button", class="btn btn-primary") Press me
+  div(id="faster" onclick="faster()") add in extra 
+  script. 
+    var value = 1;
+    var amt = 2;
+    function faster() {
+      amt *= 2
+      value += amt 
+      document.getElementById("faster").innerHTML = "Faster " + value  + " times " + amt;
+    }
+
+a(href="/dog") Dog Results
