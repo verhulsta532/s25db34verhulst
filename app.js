@@ -1,21 +1,22 @@
 require('dotenv').config();
-const mongoose = require('mongoose');
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const session = require('express-session');
+const passport = require('passport');
+const mongoose = require('mongoose');
+const LocalStrategy = require('passport-local').Strategy;
 
 // Initialize Express
 const app = express();
-app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')))
-app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js')))
-// MongoDB Connection (ONCE)
-console.log('Mongo URI:', process.env.MONGO_CON);
 
+// MongoDB Connection
+console.log('Mongo URI:', process.env.MONGO_CON);
 mongoose.connect(process.env.MONGO_CON, {
   ssl: true,
-  serverSelectionTimeoutMS: 5000, // 5 second timeout
+  serverSelectionTimeoutMS: 5000,
   socketTimeoutMS: 45000,
 })
 .then(() => console.log('MongoDB connected successfully'))
@@ -31,6 +32,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')));
+app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js')));
+
+// Session configuration (single instance)
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: false
+}));
+
+// Passport initialization (single instance)
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Routes
 const indexRouter = require('./routes/index');
@@ -40,23 +54,24 @@ const gridRouter = require('./routes/grid');
 const pickRouter = require('./routes/pick');
 const resourceRouter = require('./routes/resource');
 
-app.use('/', indexRouter);  // Changed from '/index' to '/'
+app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/dog', dogRouter);
 app.use('/grid', gridRouter);
 app.use('/randomitem', pickRouter);
 app.use('/resource/dog', resourceRouter);
 
+// Passport config (after routes)
+const Account = require('./models/account');
+passport.use(new LocalStrategy(Account.authenticate()));
+passport.serializeUser(Account.serializeUser());
+passport.deserializeUser(Account.deserializeUser());
+
 // Error handler
 app.use(function(err, req, res, next) {
-  // Set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // Ensure status is set
   err.status = err.status || 500;
-
-  // Render the error page
   res.status(err.status);
   res.render('error', {
     message: err.message,

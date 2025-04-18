@@ -8,7 +8,7 @@ const dogSchema = new mongoose.Schema({
 });
 
 // Create and export the model
-const Dog = mongoose.model('Dog', dogSchema);
+const Dog = mongoose.model('Dog', dogSchema, 'dog');
 module.exports = Dog;
 
 // Seed function

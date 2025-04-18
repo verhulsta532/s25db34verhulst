@@ -18,6 +18,7 @@ router.get('/detail', async (req, res) => {
 
 
 router.get('/', dogController.dog_view_all_Page);
+router.get('/dog/:id', dogController.dog_detail);
 router.put('/dog/:id', dogController.dog_update_put);
 router.delete('/dog/:id', dogController.dog_delete);
 module.exports = router;

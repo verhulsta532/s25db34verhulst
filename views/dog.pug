@@ -3,27 +3,18 @@ extends layout
 block content
   h1= title
   
-  //- Check if results exist and have data
-  if results && results.length > 0
-    table.table.table-striped
-      thead
-        tr
-          th Name
-          th Breed
-          th Age
-          th Actions
-      tbody
-        //- Iterate through database results
-        each dog in results
-          tr
-            td= dog.dog_name
-            td= dog.breed
-            td= dog.age
-            td
-              a.btn.btn-sm.btn-primary(href=`/dog/${dog._id}`) View
-              | 
-              a.btn.btn-sm.btn-warning(href=`/dog/${dog._id}/edit`) Edit
-  else
-    .alert.alert-warning No dogs found in the database.
-  
-  a.btn.btn-success(href="/dog/new") Add New Dog
+  - let items = results;
+  div(class="container-fluid")
+    each item in items
+      div(class="row m-1")
+        div(class="col-sm-8")
+          | Item #{item.dogname} (#{item.breed}) is #{item.age} years old
+        div(class="col-sm-4")
+          button.btn.btn-primary(
+            onclick=`dispatch("/dog/update?id=${item._id}")`
+          ) Update
+
+script.
+  function dispatch(path) {
+    window.location.href = path;
+  }
