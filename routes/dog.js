@@ -1,9 +1,23 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
+const dogController = require('../controllers/dogCollection');
+const Dog = require('../models/dog');
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('dog', { title: 'Search Results' });
+
+router.get('/detail', async (req, res) => {
+  try {
+    const results = await Dog.find().exec();
+    res.render('dog', { 
+      title: 'All Dogs',
+      results // Passing as 'results'
+    });
+  } catch (err) {
+    res.status(500).render('error', { error: err });
+  }
 });
 
+
+router.get('/', dogController.dog_view_all_Page);
+router.put('/dog/:id', dogController.dog_update_put);
+router.delete('/dog/:id', dogController.dog_delete);
 module.exports = router;

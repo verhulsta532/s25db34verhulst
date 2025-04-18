@@ -1,0 +1,29 @@
+extends layout
+
+block content
+  h1 #{title}
+
+  div.container
+    div.row
+      div.col-md-12
+        div.card.mb-3
+          div.card-body
+            h5.card-title Dog Details
+            
+            p.card-text
+              span.attr-label ID:
+              span.attr-value #{toShow._id}
+            p.card-text
+              span.attr-label Costume Name:
+              span.attr-value #{toShow.dog_name}
+            p.card-text
+              span.attr-label Costume Type:
+              span.attr-value #{toShow.breed}
+            p.card-text
+              span.attr-label Size:
+              span.attr-value #{toShow.age}
+            p.card-text
+              span.attr-label Price:
+              span.attr-value #{toShow.price}
+            
+            a.btn.btn-primary(href='/dog') Back to List

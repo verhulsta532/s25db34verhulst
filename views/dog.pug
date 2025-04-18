@@ -1,17 +1,29 @@
 extends layout
 
 block content
-  - var results = [
-  -   { name: 'Fluffy', breed: 'German Shepherd', age: 2 },
-  -   { name: 'Mittens', breed: 'Golden Retriever', age: 4 },
-  -   { name: 'Whiskers', breed: 'Bulldog', age: 1 },
-  -   { name: 'Smokey', breed: 'Poodle', age: 3 }
-  - ];
-
-  .container-fluid
-    .row
-      - each dog in results
-        .col-sm-2
-          p Name: #{dog.name}
-          p Breed: #{dog.breed}
-          p Age: #{dog.age}
+  h1= title
+  
+  //- Check if results exist and have data
+  if results && results.length > 0
+    table.table.table-striped
+      thead
+        tr
+          th Name
+          th Breed
+          th Age
+          th Actions
+      tbody
+        //- Iterate through database results
+        each dog in results
+          tr
+            td= dog.dog_name
+            td= dog.breed
+            td= dog.age
+            td
+              a.btn.btn-sm.btn-primary(href=`/dog/${dog._id}`) View
+              | 
+              a.btn.btn-sm.btn-warning(href=`/dog/${dog._id}/edit`) Edit
+  else
+    .alert.alert-warning No dogs found in the database.
+  
+  a.btn.btn-success(href="/dog/new") Add New Dog

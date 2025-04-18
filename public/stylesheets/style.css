@@ -6,3 +6,12 @@ body {
 a {
   color: #00B7FF;
 }
+
+.attr-label {
+  font-weight: bold;
+  margin-right: 0.5em;
+}
+
+.attr-value {
+  color: #333;
+}

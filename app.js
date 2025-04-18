@@ -1,95 +1,68 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+require('dotenv').config();
+const mongoose = require('mongoose');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 
-require("dotenv").config();
-const connectionString = process.env.MONGO_CON
-mongoose = require("mongoose");
-mongoose.connect(connectionString);
+// Initialize Express
+const app = express();
+app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')))
+app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js')))
+// MongoDB Connection (ONCE)
+console.log('Mongo URI:', process.env.MONGO_CON);
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var dogRouter = require('./routes/dog');
-var gridRouter = require('./routes/grid');
-var pickRouter = require('./routes/pick');
-var dog = require("./models/dog");
-const { start } = require('repl');
+mongoose.connect(process.env.MONGO_CON, {
+  ssl: true,
+  serverSelectionTimeoutMS: 5000, // 5 second timeout
+  socketTimeoutMS: 45000,
+})
+.then(() => console.log('MongoDB connected successfully'))
+.catch(err => console.error('MongoDB connection error:', err));
 
-var app = express();
-
-// view engine setup
+// View engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+// Middleware
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/index', indexRouter);
-app.use('/dog', dogRouter);
+// Routes
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const dogRouter = require('./routes/dog');
+const gridRouter = require('./routes/grid');
+const pickRouter = require('./routes/pick');
+const resourceRouter = require('./routes/resource');
+
+app.use('/', indexRouter);  // Changed from '/index' to '/'
 app.use('/users', usersRouter);
+app.use('/dog', dogRouter);
 app.use('/grid', gridRouter);
 app.use('/randomitem', pickRouter);
+app.use('/resource/dog', resourceRouter);
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
-
-// error handler
+// Error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
+  // Set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+  // Ensure status is set
+  err.status = err.status || 500;
+
+  // Render the error page
+  res.status(err.status);
+  res.render('error', {
+    message: err.message,
+    status: err.status,
+    error: err
+  });
 });
 
 module.exports = app;
-
-async function seedData() {
-  try {
-    // Delete all existing documents
-    await dog.deleteMany({});
-
-    // Create new product instances
-    const instance1 = new dog({
-      dog_name: 'Goldie',
-      breed: "Golden Lab",
-      age: 3,
-    });
-
-    const instance2 = new dog({
-      dog_name: 'Ralph',
-      breed: "Pitbull",
-      age: 1,
-    });
-
-    const instance3 = new dog({
-      dog_name:"Marus",
-      breed: "Husky",
-      age: 1,
-    });
-
-    // Save the new products
-    await instance1.save();
-    console.log('Dog 1 saved.');
-    await instance2.save();
-    console.log('Dog 2 saved.');
-    await instance3.save();
-    console.log('Dog 3 saved.');
-
-    console.log('Data seeding complete!');
-    mongoose.disconnect(); // Disconnect after seeding
-  } catch (err) {
-    console.error('Error seeding data:', err);
-    mongoose.disconnect(); // Disconnect on error
-  }
-}
-
