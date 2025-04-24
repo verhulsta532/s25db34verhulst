@@ -2,6 +2,7 @@ var express = require('express');
 var passport = require('passport');
 var router = express.Router();
 var Account = require('../models/account');
+const dogController = require('../controllers/dogCollection');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -59,8 +60,14 @@ router.get('/login', function(req, res) {
   });
 });
 
-router.post('/login', passport.authenticate('local'), function(req, res) {
-  res.redirect('/');
+router.post('/login', passport.authenticate('local', {
+  failureRedirect: '/login',
+  failureFlash: true
+}), (req, res) => {
+  // Successful authentication
+  const redirectTo = req.session.returnTo || '/';
+  delete req.session.returnTo;
+  res.redirect(redirectTo);
 });
 
 router.get('/logout', function(req, res) {
@@ -76,4 +83,23 @@ router.get('/ping', function(req, res) {
 
 module.exports = router;
 
-router.get('/update', dogCollection.dog_update_Page);
+const secured = (req, res, next) => {
+  if (req.user) {
+    return next();
+  }
+  req.session.returnTo = req.originalUrl; // Remember the original URL
+  res.redirect('/login');
+};
+
+router.get('/', dogController.dog_list);
+router.get('/create', secured, dogController.dog_create_get);
+router.post('/', secured, dogController.dog_create_post);
+router.get('/:id', dogController.dog_detail);
+router.get('/:id/update', secured, dogController.dog_update_page);
+router.post('/:id/update', secured, dogController.dog_update_post);
+router.get('/:id/delete', secured, dogController.dog_delete_get);
+router.post('/:id/delete', secured, dogController.dog_delete);
+
+module.exports = router;
+
+

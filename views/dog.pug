@@ -1,20 +1,68 @@
 extends layout
 
 block content
-  h1= title
-  
-  - let items = results;
-  div(class="container-fluid")
-    each item in items
-      div(class="row m-1")
-        div(class="col-sm-8")
-          | Item #{item.dogname} (#{item.breed}) is #{item.age} years old
-        div(class="col-sm-4")
-          button.btn.btn-primary(
-            onclick=`dispatch("/dog/update?id=${item._id}")`
-          ) Update
+  .container.mt-4
+    h1= title
 
-  script.
-    function dispatch(path) {
-      window.location.href = path;
-    }
+    if errors
+      .alert.alert-danger
+        ul
+          each error in Object.values(errors)
+            li= error
+
+    form(method='POST')
+      .form-group
+        label(for='name') Name:
+        input#name.form-control(
+          type='text',
+          name='name',
+          value=(dog && dog.name) || '',
+          class={'is-invalid': errors && errors.name}
+        )
+        if errors && errors.name
+          .invalid-feedback= errors.name
+
+      .form-group
+        label(for='breed') Breed:
+        select#breed.form-control(
+          name='breed',
+          class={'is-invalid': errors && errors.breed}
+        )
+          option(value='') -- Select Breed --
+          each breed in ['Labrador', 'Poodle', 'Bulldog', 'Beagle', 'Other']
+            option(
+              value=breed,
+              selected=(dog && dog.breed === breed)
+            )= breed
+        if errors && errors.breed.invalid-feedback= errors.breed
+
+      .form-group
+        label(for='age') Age (years):
+        input#age.form-control(
+          type='number',
+          name='age',
+          min='0',
+          max='30',
+          value=(dog && dog.age) || '',
+          class={'is-invalid': errors && errors.age}
+        )
+        if errors && errors.age
+          .invalid-feedback= errors.age
+
+        .form-group
+        label(for='weight') Weight (kg):
+        input#weight.form-control(
+          type='number',
+          name='weight',
+          min='1',
+          max='100',
+          step='1',
+          value=(dog && dog.weight) || '',
+          class={'is-invalid': errors && errors.weight},
+          required
+        )
+        if errors && errors.weight
+          .invalid-feedback= errors.weight
+
+      button.btn.btn-primary(type='submit') Submit
+      a.btn.btn-secondary.ml-2(href='/dog') Cancel

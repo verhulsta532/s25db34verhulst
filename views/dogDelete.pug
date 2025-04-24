@@ -1,0 +1,13 @@
+extends layout
+
+block content
+  .container.mt-4
+    h1 Delete Dog
+    
+    p Are you sure you want to delete #{dog.dog_name} (#{dog.breed})?
+    
+    form(method='POST' action=`/dog/${dog._id}/delete`)
+      input(type='hidden' name='_method' value='DELETE')
+      button.btn.btn-danger(type='submit') Delete
+      |  
+      a.btn.btn-secondary(href='/dogs') Cancel

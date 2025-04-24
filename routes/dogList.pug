@@ -27,15 +27,15 @@ block content
             td= dog.age
             td
               // View Button (public)
-              a.btn.btn-sm.btn-info.mr-1(href=`/dog/${dog._id}`) View
+              a.btn.btn-sm.btn-info.mr-1(href=`/dogs/${dog._id}`) View
               
               // Edit Button (protected)
               if user
-                a.btn.btn-sm.btn-warning.mr-1(href=`/dog/${dog._id}/update`) Edit
+                a.btn.btn-sm.btn-warning.mr-1(href=`/dogs/${dog._id}/update`) Edit
               
               // Delete Button (protected)
               if user
                 a.btn.btn-sm.btn-danger(
-                  href=`/dog/${dog._id}/delete`
+                  href=`/dogs/${dog._id}/delete`
                   onclick="return confirm('Are you sure you want to delete this dog?')"
                 ) Delete
